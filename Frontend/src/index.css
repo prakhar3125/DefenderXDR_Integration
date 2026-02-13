@@ -1,0 +1,105 @@
+:root {
+  /* ION Group Corporate Palette */
+  --ion-blue: #1DA3DD;       /* Primary Action / Highlight */
+  --ion-blue-hover: #1589bc; /* Darker blue for hover states */
+  --ion-dark: #333333;       /* Main Background (Dark Grey) */
+  --ion-navy: #001437;       /* Corporate Headers / Sidebars / Cards */
+  --ion-white: #FFFFFF;      /* Primary Text */
+  --ion-text-muted: #cccccc; /* Secondary Text */
+  --ion-border: #4a4a4a;     /* Subtle Borders */
+  
+  /* Global Settings */
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* Force Dark Scheme for consistency with Dashboard */
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* GLOBAL RESET */
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--ion-dark);
+  color: var(--ion-white);
+  overflow: hidden; /* Prevents double scrollbars in dashboard layouts */
+}
+
+/* RESET VITE DEFAULTS */
+/* The default Vite CSS centers everything. We REMOVE that for a dashboard. */
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TYPOGRAPHY */
+a {
+  font-weight: 500;
+  color: var(--ion-blue);
+  text-decoration: none;
+  transition: color 0.25s;
+}
+
+a:hover {
+  color: var(--ion-blue-hover);
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ion-white);
+}
+
+/* BUTTONS */
+button {
+  border-radius: 4px; /* More square/corporate look */
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--ion-navy);
+  color: var(--ion-white);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+button:hover {
+  border-color: var(--ion-blue);
+  background-color: rgba(29, 163, 221, 0.1); /* Subtle blue tint on hover */
+}
+
+button:focus,
+button:focus-visible {
+  outline: 2px solid var(--ion-blue);
+  outline-offset: 2px;
+}
+
+/* SCROLLBAR CUSTOMIZATION (Optional but nice for dark themes) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ion-dark); 
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ion-border); 
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ion-blue); 
+}
