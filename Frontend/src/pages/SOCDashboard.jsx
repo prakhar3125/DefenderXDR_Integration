@@ -754,10 +754,18 @@ export default function SOCDashboard() {
     }
   };
 
-  // Shared effects
   useEffect(() => {
-    NotificationManager.requestPermission();
-  }, []);
+  // iOS often crashes if we ask for permission without a click.
+  // We wrap this to prevent the "White Screen" crash.
+  try {
+    if ("Notification" in window && Notification.permission === "granted") {
+      // Only check if already granted
+      NotificationManager.requestPermission();
+    }
+  } catch (e) {
+    console.log("Notification check skipped on mobile");
+  }
+}, []);
 
   useEffect(() => {
     if (!autoRefresh) return;
