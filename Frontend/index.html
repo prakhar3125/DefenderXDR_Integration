@@ -2,19 +2,52 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SOC Command Center - Windows Defender XDR</title>
+    <!-- CRITICAL: Mobile viewport settings -->
+    <meta 
+      name="viewport" 
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" 
+    />
+    <!-- Prevent phone number detection on iOS -->
+    <meta name="format-detection" content="telephone=no" />
+    <!-- PWA settings for mobile -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <title>SOC Sentinel - Defender XDR</title>
+    
     <style>
+      /* MINIMAL global styles - let Layout.jsx handle the rest */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        /* Fix for iOS Safari viewport issues */
+        height: -webkit-fill-available;
+      }
+
       body {
         margin: 0;
         padding: 0;
-        font-family: monospace;
-        background: #050810;
-        color: #e0e6f0;
+        font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+        background: #050b17;
+        color: #c0d4ec;
+        /* Prevent iOS Safari bounce/rubber-banding */
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+        /* Fix for mobile viewport */
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
       }
+
+      /* REMOVED: Conflicting #root styles */
+      /* Let Layout.jsx handle root styling */
       #root {
         width: 100%;
-        height: 100vh;
+        height: 100%;
       }
     </style>
   </head>

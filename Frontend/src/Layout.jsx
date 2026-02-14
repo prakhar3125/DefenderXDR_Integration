@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "./Navbar";
+import Navbar, { MobileHeader, MobileBottomNav } from "./Navbar";
 
 // ═══════════════════════════════════════════════════════════════
 // RESPONSIVE HOOK
@@ -40,8 +40,6 @@ export default function Layout() {
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-        
-        /* REMOVED: Conflicting #root styles that were breaking mobile */
         
         /* Scrollbar styles for desktop */
         ::-webkit-scrollbar {
@@ -95,8 +93,8 @@ export default function Layout() {
         }
       `}</style>
 
-      {/* Navbar (conditionally renders mobile/desktop) */}
-      <Navbar />
+      {/* Navbar - Desktop only OR Mobile Header */}
+      {isMobile ? <MobileHeader /> : <Navbar />}
 
       {/* Main Content Area */}
       <div style={{ 
@@ -104,14 +102,13 @@ export default function Layout() {
         overflow: "hidden", 
         display: "flex", 
         flexDirection: "column",
-        position: "relative",
-        // Add bottom padding on mobile for bottom nav
-        paddingBottom: isMobile 
-          ? "calc(60px + env(safe-area-inset-bottom, 0px))" 
-          : 0
+        position: "relative"
       }}>
         <Outlet />
       </div>
+
+      {/* Mobile Bottom Nav - Only on mobile */}
+      {isMobile && <MobileBottomNav />}
     </div>
   );
 }
