@@ -2,15 +2,18 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 // ═══════════════════════════════════════════════════════════════
-// RESPONSIVE HOOK
+// RESPONSIVE HOOK - SSR-SAFE (CRITICAL FIX)
 // ═══════════════════════════════════════════════════════════════
 
 function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = useState(false);
+  // CRITICAL: Initialize with correct value immediately
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' && window.innerWidth <= breakpoint
+  );
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= breakpoint);
-    checkMobile();
+    checkMobile(); // Check immediately
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, [breakpoint]);
@@ -449,7 +452,7 @@ function MobileStatsCard({ incidents }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// DESKTOP COMPONENTS (unchanged from original)
+// DESKTOP COMPONENTS (unchanged)
 // ═══════════════════════════════════════════════════════════════
 
 function IncidentRow({ incident, onClick, selected }) {
@@ -754,18 +757,18 @@ export default function SOCDashboard() {
     }
   };
 
+  // SKIP notifications on mobile to prevent crashes
   useEffect(() => {
-  // iOS often crashes if we ask for permission without a click.
-  // We wrap this to prevent the "White Screen" crash.
-  try {
-    if ("Notification" in window && Notification.permission === "granted") {
-      // Only check if already granted
-      NotificationManager.requestPermission();
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      try {
+        if ("Notification" in window && Notification.permission === "granted") {
+          NotificationManager.requestPermission();
+        }
+      } catch (e) {
+        console.log("Notification check skipped");
+      }
     }
-  } catch (e) {
-    console.log("Notification check skipped on mobile");
-  }
-}, []);
+  }, []);
 
   useEffect(() => {
     if (!autoRefresh) return;
@@ -779,7 +782,12 @@ export default function SOCDashboard() {
           newIncident.incidentName = NAMES[Math.floor(Math.random() * NAMES.length)];
         }
         setIncidents(prev => [newIncident, ...prev.slice(0, 99)]);
-        NotificationManager.checkNewIncidents([newIncident], lastCheckTime, soundEnabled, (id) => setSelected(id));
+        
+        // Only check notifications on desktop
+        if (typeof window !== 'undefined' && window.innerWidth > 768) {
+          NotificationManager.checkNewIncidents([newIncident], lastCheckTime, soundEnabled, (id) => setSelected(id));
+        }
+        
         setLastCheckTime(new Date());
         setLastRefresh(new Date());
       }
@@ -797,10 +805,12 @@ export default function SOCDashboard() {
   if (isMobile) {
     return (
       <div style={{
-        width: "100%", minHeight: "100vh",
-        background: "#050b17", color: "#c0d4ec",
+        width: "100%",
+        minHeight: "100%",
+        background: "#050b17",
+        color: "#c0d4ec",
         fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
-        paddingBottom: "80px"
+        overflow: "auto"
       }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -808,41 +818,13 @@ export default function SOCDashboard() {
           @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
           @keyframes fadeIn { from{opacity:0} to{opacity:1} }
           @keyframes slideUpSheet { from{transform:translateY(100%)} to{transform:translateY(0)} }
-          ::-webkit-scrollbar { display: none; }
         `}</style>
 
-        {/* Mobile Header */}
-        <header style={{ position: "sticky", top: 0, zIndex: 100, background: "#040a16", borderBottom: "1px solid #090f1e", padding: "14px 16px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <polygon points="12,2 22,20 2,20" fill="none" stroke="#ff2055" strokeWidth="1.5"/>
-              <polygon points="12,7 19,18 5,18" fill="#ff205512" stroke="#ff205528" strokeWidth="0.5"/>
-              <circle cx="12" cy="16" r="1.5" fill="#ff2055"/>
-              <line x1="12" y1="10" x2="12" y2="14" stroke="#ff2055" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "14px", fontWeight: 700, color: "#d0e8ff", letterSpacing: "0.04em" }}>SOC SENTINEL</div>
-              <div style={{ fontSize: "8px", color: "#1a3050", letterSpacing: "0.15em" }}>DEFENDER XDR</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-              <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#00ff9d", animation: "pulse 2s infinite" }} />
-              <span style={{ fontSize: "8px", color: "#164030", fontWeight: 700 }}>LIVE</span>
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: "8px" }}>
-            <button onClick={() => setShowFilters(true)} style={{ flex: 1, padding: "10px", background: "#08101e", border: "1px solid #111d30", borderRadius: "6px", color: "#4a6a8a", fontSize: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontFamily: "inherit" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
-              FILTERS
-            </button>
-            <button style={{ padding: "10px 14px", background: "#08101e", border: "1px solid #111d30", borderRadius: "6px", color: "#4a6a8a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-            </button>
-          </div>
-        </header>
-
         {/* Content */}
-        <div style={{ padding: "12px 16px" }}>
+        <div style={{ padding: "12px 16px", paddingBottom: "80px" }}>
           <MobileStatsCard incidents={incidents} />
+          
+          {/* Filter chips */}
           {(filters.severity !== "ALL" || filters.statusFilter !== "ALL") && (
             <div style={{ marginBottom: "12px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
               {filters.severity !== "ALL" && (
@@ -859,9 +841,11 @@ export default function SOCDashboard() {
               )}
             </div>
           )}
+          
           <div style={{ fontSize: "9px", color: "#2e4a65", marginBottom: "10px" }}>
             Showing {sortedIncidents.length} of {incidents.length} incidents
           </div>
+          
           {sortedIncidents.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 20px" }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#111d30" strokeWidth="1" style={{ margin: "0 auto 12px" }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -880,7 +864,7 @@ export default function SOCDashboard() {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // DESKTOP LAYOUT
+  // DESKTOP LAYOUT (unchanged - keeping all desktop features)
   // ═══════════════════════════════════════════════════════════════
 
   return (
