@@ -1,7 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Navbar() {
+// ═══════════════════════════════════════════════════════════════
+// RESPONSIVE HOOK
+// ═══════════════════════════════════════════════════════════════
+
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= breakpoint);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DESKTOP NAVBAR (Original)
+// ═══════════════════════════════════════════════════════════════
+
+function DesktopNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -39,9 +60,13 @@ export default function Navbar() {
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.2; }
+        }
       `}</style>
 
-      {/* Logo Section - matching SOC Dashboard */}
+      {/* Logo Section */}
       <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <polygon points="12,2 22,20 2,20" fill="none" stroke="#ff2055" strokeWidth="1.5"/>
@@ -230,6 +255,181 @@ export default function Navbar() {
           Exit
         </button>
       </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MOBILE BOTTOM NAV (New)
+// ═══════════════════════════════════════════════════════════════
+
+function MobileBottomNav() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = (path) => location.pathname.startsWith(path);
+
+  const navItems = [
+    { 
+      path: "/dashboard", 
+      icon: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22v-10h6v10", 
+      label: "Home" 
+    },
+    { 
+      path: "/notifications", 
+      icon: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0", 
+      label: "Alerts" 
+    },
+    { 
+      path: "/analytics", 
+      icon: "M18 20V10 M12 20V4 M6 20v-6", 
+      label: "Stats" 
+    },
+    { 
+      path: "/settings", 
+      icon: "M12 15a3 3 0 100-6 3 3 0 000 6z M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z", 
+      label: "Menu" 
+    }
+  ];
+
+  return (
+    <nav style={{
+      position: "fixed",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      background: "#040a16",
+      borderTop: "1px solid #090f1e",
+      padding: "8px 0 calc(8px + env(safe-area-inset-bottom))", // Safe area for iPhone notch
+      display: "flex",
+      justifyContent: "space-around",
+      zIndex: 1000,
+      boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.3)"
+    }}>
+      {navItems.map(({ path, icon, label }) => {
+        const active = isActive(path);
+        return (
+          <button
+            key={path}
+            onClick={() => navigate(path)}
+            style={{
+              background: "none",
+              border: "none",
+              color: active ? "#00d4ff" : "#2e4a65",
+              cursor: "pointer",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "4px",
+              padding: "6px 12px",
+              flex: 1,
+              position: "relative",
+              transition: "all 0.2s",
+              WebkitTapHighlightColor: "transparent"
+            }}
+          >
+            {/* Active indicator */}
+            {active && (
+              <div style={{
+                position: "absolute",
+                top: 0,
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "32px",
+                height: "2px",
+                background: "#00d4ff",
+                borderRadius: "0 0 2px 2px"
+              }} />
+            )}
+            
+            <svg 
+              width="22" 
+              height="22" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d={icon}/>
+            </svg>
+            <span style={{ 
+              fontSize: "9px", 
+              fontWeight: active ? 700 : 600,
+              fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+              letterSpacing: "0.04em"
+            }}>
+              {label}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MOBILE HEADER (Minimal top bar for mobile)
+// ═══════════════════════════════════════════════════════════════
+
+function MobileHeader() {
+  return (
+    <div style={{
+      height: "56px",
+      background: "#040a16",
+      borderBottom: "1px solid #090f1e",
+      display: "flex",
+      alignItems: "center",
+      padding: "0 16px",
+      position: "sticky",
+      top: 0,
+      zIndex: 100
+    }}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <polygon points="12,2 22,20 2,20" fill="none" stroke="#ff2055" strokeWidth="1.5"/>
+        <polygon points="12,7 19,18 5,18" fill="#ff205512" stroke="#ff205528" strokeWidth="0.5"/>
+        <circle cx="12" cy="16" r="1.5" fill="#ff2055"/>
+        <line x1="12" y1="10" x2="12" y2="14" stroke="#ff2055" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+      <div style={{ marginLeft: "12px", flex: 1 }}>
+        <div style={{ 
+          fontSize: "14px", 
+          fontWeight: 700, 
+          color: "#d0e8ff", 
+          letterSpacing: "0.04em",
+          fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace"
+        }}>
+          SOC SENTINEL
+        </div>
+        <div style={{ 
+          fontSize: "8px", 
+          color: "#1a3050", 
+          letterSpacing: "0.15em",
+          fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace"
+        }}>
+          DEFENDER XDR
+        </div>
+      </div>
+      
+      {/* Live indicator */}
+      <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div style={{ 
+          width: "6px", 
+          height: "6px", 
+          borderRadius: "50%", 
+          background: "#00ff9d",
+          animation: "pulse 2s infinite"
+        }} />
+        <span style={{ 
+          fontSize: "8px", 
+          color: "#164030", 
+          fontWeight: 700,
+          fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace"
+        }}>
+          LIVE
+        </span>
+      </div>
 
       <style>{`
         @keyframes pulse {
@@ -239,4 +439,23 @@ export default function Navbar() {
       `}</style>
     </div>
   );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN NAVBAR COMPONENT (Conditional)
+// ═══════════════════════════════════════════════════════════════
+
+export default function Navbar() {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <>
+        <MobileHeader />
+        <MobileBottomNav />
+      </>
+    );
+  }
+
+  return <DesktopNavbar />;
 }
