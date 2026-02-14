@@ -281,9 +281,9 @@ function MobileIncidentCard({ incident, onClick }) {
         background: "#060c19",
         border: "1px solid #0d1928",
         borderLeft: `4px solid ${sev.color}`,
-        borderRadius: "6px",
-        padding: "14px",
-        marginBottom: "10px",
+        borderRadius: "8px",
+        padding: "16px",
+        marginBottom: "12px",
         cursor: "pointer",
         transition: "all 0.2s",
         WebkitTapHighlightColor: "transparent"
@@ -291,63 +291,49 @@ function MobileIncidentCard({ incident, onClick }) {
       onTouchStart={e => e.currentTarget.style.background = "#070e1c"}
       onTouchEnd={e => e.currentTarget.style.background = "#060c19"}
     >
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: "10px" }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "9px", color: "#1e3a55" }}>#{incident.incidentId}</span>
-            <div style={{ padding: "2px 6px", borderRadius: "3px", background: sev.glow, border: `1px solid ${sev.color}40`, color: sev.color, fontSize: "8px", fontWeight: 700 }}>
-              {sev.label}
-            </div>
-            <div style={{ padding: "2px 6px", borderRadius: "3px", background: `${stat.color}15`, border: `1px solid ${stat.color}35`, color: stat.color, fontSize: "8px", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}>
-              {isNew && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: stat.color, animation: "pulse 1.8s infinite" }} />}
-              {stat.label}
-            </div>
-            {incident.isHighValue && (
-              <div style={{ padding: "2px 6px", borderRadius: "3px", background: "#ff990015", border: "1px solid #ff990035", color: "#ff9900", fontSize: "8px", fontWeight: 700 }}>
-                ⬡ VIP
-              </div>
-            )}
-          </div>
-          <div style={{ fontSize: "13px", color: "#cce0ff", fontWeight: 600, lineHeight: 1.3, marginBottom: "6px" }}>
-            {incident.incidentName}
-          </div>
+      {/* Header Row - ID, Severity, Status */}
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", flexWrap: "wrap" }}>
+        <span style={{ fontSize: "10px", color: "#4a6a8a", fontWeight: 600 }}>#{incident.incidentId}</span>
+        <div style={{ padding: "3px 8px", borderRadius: "4px", background: sev.glow, border: `1px solid ${sev.color}40`, color: sev.color, fontSize: "9px", fontWeight: 700, letterSpacing: "0.02em" }}>
+          {sev.label}
+        </div>
+        <div style={{ padding: "3px 8px", borderRadius: "4px", background: `${stat.color}15`, border: `1px solid ${stat.color}35`, color: stat.color, fontSize: "9px", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}>
+          {isNew && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: stat.color, animation: "pulse 1.8s infinite" }} />}
+          {stat.label}
+        </div>
+        <div style={{ marginLeft: "auto", fontSize: "9px", color: "#2e4a65", fontWeight: 500 }}>
+          {timeAgo(incident.createdTime)}
         </div>
       </div>
 
-      {/* Details grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+      {/* Incident Name */}
+      <div style={{ fontSize: "14px", color: "#d0e8ff", fontWeight: 600, lineHeight: 1.4, marginBottom: "12px" }}>
+        {incident.incidentName}
+      </div>
+
+      {/* Info Grid - 2 columns */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 12px", marginBottom: "12px" }}>
         <div>
-          <div style={{ fontSize: "7px", color: "#1a3050", marginBottom: "2px", textTransform: "uppercase" }}>Category</div>
-          <div style={{ fontSize: "10px", color: cat?.color || "#4a7090" }}>{cat?.label}</div>
+          <div style={{ fontSize: "8px", color: "#2e4a65", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Category</div>
+          <div style={{ fontSize: "11px", color: cat?.color || "#00d4ff", fontWeight: 600 }}>{cat?.label}</div>
         </div>
         <div>
-          <div style={{ fontSize: "7px", color: "#1a3050", marginBottom: "2px", textTransform: "uppercase" }}>Device</div>
-          <div style={{ fontSize: "10px", color: "#4a7090", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <div style={{ fontSize: "8px", color: "#2e4a65", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Device</div>
+          <div style={{ fontSize: "11px", color: "#8aaccc", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {incident.alerts[0]?.deviceId}
           </div>
         </div>
-        <div>
-          <div style={{ fontSize: "7px", color: "#1a3050", marginBottom: "2px", textTransform: "uppercase" }}>Assigned</div>
-          <div style={{ fontSize: "10px", color: "#4a7090", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <div style={{ fontSize: "8px", color: "#2e4a65", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Assigned To</div>
+          <div style={{ fontSize: "11px", color: incident.assignedTo ? "#8aaccc" : "#4a5568", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {incident.assignedTo || "Unassigned"}
           </div>
         </div>
-        <div>
-          <div style={{ fontSize: "7px", color: "#1a3050", marginBottom: "2px", textTransform: "uppercase" }}>Age</div>
-          <div style={{ fontSize: "10px", color: "#4a7090" }}>{timeAgo(incident.createdTime)}</div>
-        </div>
       </div>
 
-      {/* SLA */}
-      <SlaBar incident={incident} isMobile={true} />
-
-      {/* Footer */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "8px", borderTop: "1px solid #0a1528" }}>
-        <span style={{ fontSize: "8px", color: "#2e4a65" }}>
-          {incident.comments.length > 0 && `💬 ${incident.comments.length}`}
-        </span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2e4a65" strokeWidth="2">
+      {/* Footer - Chevron only */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", paddingTop: "12px", borderTop: "1px solid #0a1528" }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a6a8a" strokeWidth="2.5">
           <path d="M9 18l6-6-6-6"/>
         </svg>
       </div>
@@ -465,7 +451,7 @@ function IncidentRow({ incident, onClick, selected }) {
   return (
     <div onClick={onClick} style={{
         display: "grid",
-        gridTemplateColumns: "3px 68px 72px 80px 1fr 120px 100px 56px 120px 44px 36px",
+        gridTemplateColumns: "3px 68px 72px 80px 1fr 120px 100px 120px 36px",
         alignItems: "center", gap: "0 10px", padding: "0 16px", height: "44px",
         cursor: "pointer", borderBottom: "1px solid #070d1a",
         background: selected ? "#00d4ff07" : "transparent", transition: "background 0.15s"
@@ -481,12 +467,10 @@ function IncidentRow({ incident, onClick, selected }) {
         {stat.label}
       </div>
       <span style={{ fontSize: "11px", color: "#b0cae6", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {incident.isHighValue && <span style={{ color: "#ff9900", marginRight: "6px", fontSize: "8px", fontWeight: 700 }}>⬡ VIP</span>}
         {incident.incidentName}
       </span>
       <span style={{ fontSize: "10px", color: cat?.color || "#2e4a65", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500 }}>{cat?.label || incident.determination}</span>
       <span style={{ fontSize: "9px", color: "#1e3a55", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{incident.alerts[0]?.deviceId}</span>
-      <div style={{ display: "flex", alignItems: "center" }}><SlaBar incident={incident} isMobile={false} /></div>
       <div style={{ display: "flex", alignItems: "center", gap: "5px", overflow: "hidden" }}>
         {analyst ? (
           <>
@@ -498,16 +482,6 @@ function IncidentRow({ incident, onClick, selected }) {
           </>
         ) : (
           <span style={{ fontSize: "9px", color: "#1a2e45", fontStyle: "italic" }}>Unassigned</span>
-        )}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-        {incident.comments.length > 0 && (
-          <span style={{ fontSize: "9px", color: "#1e3a55", display: "flex", alignItems: "center", gap: "3px" }}>
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            {incident.comments.length}
-          </span>
         )}
       </div>
       <span style={{ fontSize: "9px", color: "#1e3a55", textAlign: "right" }}>{timeAgo(incident.createdTime)}</span>
@@ -600,12 +574,6 @@ function MetricsDropdown({ incidents }) {
               <div style={{ fontSize: "8px", color: "#1e3050" }}>of {MOCK_ANALYSTS.length} online</div>
             </div>
           </div>
-          {m.highValue > 0 && (
-            <div style={{ padding: "9px 16px", borderTop: "1px solid #0a1528", background: "#ff990008", display: "flex", alignItems: "center", gap: "8px" }}>
-              <span style={{ fontSize: "9px", color: "#ff9900", letterSpacing: "0.08em" }}>⬡ HIGH-VALUE ASSET INCIDENTS</span>
-              <span style={{ fontSize: "15px", fontWeight: 700, color: "#ff9900", fontFamily: "inherit", marginLeft: "auto" }}>{m.highValue}</span>
-            </div>
-          )}
         </div>
       )}
     </div>
@@ -641,7 +609,6 @@ function DetailPanel({ incident, onClose, onNavigate }) {
               <span style={{ padding: "1px 6px", background: sev.glow, border: `1px solid ${sev.color}40`, color: sev.color, fontSize: "8px", fontWeight: 700, borderRadius: "2px" }}>{sev.label}</span>
               <span style={{ padding: "1px 6px", background: `${stat.color}15`, border: `1px solid ${stat.color}35`, color: stat.color, fontSize: "8px", fontWeight: 700, borderRadius: "2px" }}>{stat.label}</span>
               <span style={{ fontSize: "8px", color: "#4a6a8a" }}>classification: {incident.classification}</span>
-              {incident.isHighValue && <span style={{ fontSize: "8px", color: "#ff9900", fontWeight: 700 }}>⬡ VIP ASSET</span>}
             </div>
             <div style={{ fontSize: "13px", color: "#cce0ff", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{incident.incidentName}</div>
           </div>
@@ -936,7 +903,6 @@ export default function SOCDashboard() {
         </select>
         <div style={{ width: "1px", height: "18px", background: "#090f1e" }} />
         <FilterChip label="SLA AT RISK" icon="🔥" active={filters.sortBy === "urgency"} color="#ff2055" onClick={() => setFilters(f => ({ ...f, sortBy: f.sortBy === "urgency" ? "date" : "urgency" }))} />
-        <FilterChip label="VIP ASSETS" icon="⬡" active={filters.assetType === "critical"} color="#ff9900" onClick={() => toggle("assetType", "critical")} />
         <FilterChip label="ACTIVE BREACH" icon="⚡" active={filters.attackStage === "impact"} color="#ff00cc" onClick={() => toggle("attackStage", "impact")} />
         <FilterChip label="NEEDS ACTION" icon="◉" active={filters.status === "pending_action"} color="#00d4ff" onClick={() => toggle("status", "pending_action")} />
         <div style={{ flex: 1 }} />
@@ -944,8 +910,8 @@ export default function SOCDashboard() {
       </div>
 
       {/* Table Header */}
-      <div style={{ display: "grid", gridTemplateColumns: "3px 68px 72px 80px 1fr 120px 100px 56px 120px 44px 36px", alignItems: "center", gap: "0 10px", padding: "0 16px", height: "28px", background: "#030810", borderBottom: "1px solid #070d18", flexShrink: 0 }}>
-        {["", "ID", "SEV", "STATUS", "INCIDENT NAME", "CATEGORY", "DEVICE", "SLA", "ANALYST", "CMT", "AGE"].map((h, i) => (
+      <div style={{ display: "grid", gridTemplateColumns: "3px 68px 72px 80px 1fr 120px 100px 120px 36px", alignItems: "center", gap: "0 10px", padding: "0 16px", height: "28px", background: "#030810", borderBottom: "1px solid #070d18", flexShrink: 0 }}>
+        {["", "ID", "SEV", "STATUS", "INCIDENT NAME", "CATEGORY", "DEVICE", "ANALYST", "AGE"].map((h, i) => (
           <span key={i} style={{ fontSize: "7px", fontWeight: 700, color: "#1a3050", letterSpacing: "0.14em" }}>{h}</span>
         ))}
       </div>
